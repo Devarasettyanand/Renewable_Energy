@@ -1,0 +1,132 @@
+create or replace database Renewable_Energy_db ;  -- creating Database
+
+create or replace schema Renewable_Energy_schema ;  -- creating schema
+
+CREATE OR REPLACE STORAGE INTEGRATION TABLEAU_PROJECT   -- creating storage integration
+      TYPE = EXTERNAL_STAGE
+      STORAGE_PROVIDER = 'S3'
+      ENABLED = TRUE
+      STORAGE_AWS_ROLE_ARN = 'arn:aws:iam::827859361686:role/tableaudeveloper'
+      STORAGE_ALLOWED_LOCATIONS = ('s3://tabuleauprojects/') ;
+      
+DESC  INTEGRATION TABLEAU_PROJECT ;    --update STORAGE_AWS_IAM_USER_ARN & STORAGE_AWS_EXTERNAL_ID in IAM
+
+
+CREATE OR REPLACE FILE FORMAT CSV_FORMAT      -- creating file format
+     TYPE = 'CSV'
+     SKIP_HEADER = 1
+     FIELD_DELIMITER = ','
+     RECORD_DELIMITER = '\n'
+     
+ 
+create table tableau_dataset (                                                      -- creating TABLE
+Household_ID	string,Region	string,Country	string,Energy_Source	string,
+Monthly_Usage_kWh	float,Year	int,Household_Size	int,Income_Level	string,
+Urban_Rural	string,Adoption_Year	int,Subsidy_Received	string,Cost_Savings_USD float
+);
+
+
+CREATE OR REPLACE STAGE TABLEAU_STAGE                                            -- creating  STAGE
+      STORAGE_INTEGRATION = TABLEAU_PROJECT
+      URL = 's3://tabuleauprojects/Renewable_Energy_Usage_Sampled (2).csv'
+
+
+COPY INTO tableau_dataset       -- Loading into table
+FROM @TABLEAU_STAGE
+FILE_FORMAT = CSV_FORMAT ;
+
+LIST @TABLEAU_STAGE ;
+
+SELECT * FROM tableau_dataset ;
+
+
+ALTER TABLE tableau_dataset
+RENAME TO Renewable_Energy_table ;
+
+
+-- TO APPLY transformations on New table.
+
+CREATE TABLE ENERGY_CONSUMPTION AS     
+SELECT * FROM Renewable_Energy_table ;
+
+
+SELECT * FROM ENERGY_CONSUMPTION ;
+
+
+-- business requirement :
+-- we need to increase MONTHLY_USAGE_KWH :
+-- 10% for low 
+-- 20% for middle
+-- 30% for High
+
+-- For 10% for low
+
+update ENERGY_CONSUMPTION
+set MONTHLY_USAGE_KWH = MONTHLY_USAGE_KWH*1.1
+where INCOME_LEVEL = 'Low'
+
+-- For 20% for middle
+
+update ENERGY_CONSUMPTION
+set MONTHLY_USAGE_KWH = MONTHLY_USAGE_KWH*1.2
+where INCOME_LEVEL = 'Middle'
+
+
+-- For 30% for High
+
+update ENERGY_CONSUMPTION
+set MONTHLY_USAGE_KWH = MONTHLY_USAGE_KWH*1.3
+where INCOME_LEVEL = 'High'
+
+
+-- business requirement :
+-- we need to REDUCE COST_SAVINGS_USD :
+-- 10% for low 
+-- 20% for middle
+-- 30% for High
+
+-- For 10% for low
+
+update ENERGY_CONSUMPTION
+set COST_SAVINGS_USD = COST_SAVINGS_USD*0.1
+where INCOME_LEVEL = 'Low'
+
+-- For 20% for middle
+
+update ENERGY_CONSUMPTION
+set COST_SAVINGS_USD = COST_SAVINGS_USD*0.2
+where INCOME_LEVEL = 'Middle'
+
+
+-- For 30% for High
+
+update ENERGY_CONSUMPTION
+set COST_SAVINGS_USD = COST_SAVINGS_USD*0.3
+where INCOME_LEVEL = 'High'
+
+-- Setup by tableau by Entering below details.
+
+-- Credentials of snowflake - user name , Password.
+-- selecting warehouse
+-- selecting Database
+-- selecting Schema
+-- Draging the ENERGY_CONSUMPTION to table in tableau and build worksheet and Dashboard.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
