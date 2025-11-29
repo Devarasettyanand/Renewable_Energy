@@ -8,3 +8,18 @@ This mini-project demonstrates an end-to-end cloud data pipeline using AWS S3 �
 Data Source → S3 Bucket → Snowflake Stage → Snowflake Tables  
 → Data Transformation (SQL) → Tableau → Dashboards
 
+🧠 Skills Used in This Project
+
+AWS S3 (data ingestion)
+
+Snowflake SQL (ETL + data modeling)
+
+Snowflake Stages & COPY INTO
+
+Tableau (visualization + publishing)
+
+Cost optimization analytics
+
+Cloud data engineering fundamentals
+
+
