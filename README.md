@@ -23,3 +23,7 @@ Cost optimization analytics
 Cloud data engineering fundamentals
 
 
+🎯 Use Case Summary
+
+This project reflects how enterprises analyze renewable energy consumption, optimize energy spend, and visualize insights for sustainability efforts.
+
